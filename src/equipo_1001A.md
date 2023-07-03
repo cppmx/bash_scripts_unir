@@ -4,7 +4,7 @@
 *Actividad grupal*: Programación en Bash
 
 ## Integrantes
-José Andrés Bardales Calva
-Carlos Eduardo Colón Rangel
-Elena María Elyoenia García Mejía
-Javier Gutiérrez Fausto
+- José Andrés Bardales Calva
+- Carlos Eduardo Colón Rangel
+- Elena María Elyoenia García Mejía
+- Javier Gutiérrez Fausto
