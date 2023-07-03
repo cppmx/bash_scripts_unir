@@ -17,10 +17,15 @@ function ejecutar_pruebas()
     local script_num=$1
     local pruebas=("${!2}")
     local mensaje=$3
+    local workdir="/app"
+
+    if [[ "$4" != "" ]]; then
+        workdir=$4
+    fi
 
     for ((i = 0; i < ${#pruebas[@]}; i++)); do
         echo -e "\n${azul}PRUEBA $((i+1))${reset}: $mensaje ${pruebas[i]}"
-        docker run --rm bash_test:unir ${pruebas[i]}
+        docker run --rm -u test -w $workdir bash_test:unir ${pruebas[i]}
         validar_respuesta
     done
 }
@@ -28,30 +33,82 @@ function ejecutar_pruebas()
 function pruebas_script_1()
 {
     local pruebas=(
-        "/app/script1.sh /test"                            # PRUEBA 1, se espera que sea exitosa
-        "/app/script1.sh /test/archivo1.txt"               # PRUEBA 2, se espera que sea exitosa
-        "/app/script1.sh /bin/bash"                        # PRUEBA 3, se espera que sea exitosa
-        "/app/script1.sh /dev/stderr"                      # PRUEBA 4, se espera que sea exitosa
-        "/app/script1.sh /directorio"                      # PRUEBA 5, se espera que falle
-        "/app/script1.sh /directorio/algun_archivo.txt"    # PRUEBA 6, se espera que falle
-        "/app/script1.sh"                                  # PRUEBA 7, se espera que falle
+        "/app/script1.sh /test"
+        "/app/script1.sh /test/archivo1.txt"
+        "/app/script1.sh /bin/bash"
+        "/app/script1.sh /dev/stderr"
+        "/app/script1.sh /directorio"
+        "/app/script1.sh /directorio/algun_archivo.txt"
+        "/app/script1.sh"
     )
 
-    ejecutar_pruebas 1 pruebas[@] "Probando el script 1 con el parámetro"
+    ejecutar_pruebas 1 pruebas[@] "Probando el script 1:"
+}
+
+function pruebas_script_2()
+{
+    local pruebas=(
+        "/app/script2.sh"
+        "/app/script2.sh /test/archivo1.txt"
+        "/app/script2.sh /test/image1.jpg"
+        "/app/script2.sh /test/archivo2.txt"
+        "/app/script2.sh /test/image2.jpg"
+        "/app/script2.sh /test/archivo3.txt"
+        "/app/script2.sh /test/image3.jpg"
+        "/app/script2.sh /test/image2.JPG"
+    )
+
+    ejecutar_pruebas 2 pruebas[@] "Probando el script 2:"
+}
+
+function pruebas_script_3()
+{
+    local pruebas=(
+        "/app/script3.sh"
+        "/app/script3.sh param1"
+        "/app/script3.sh param1 param2"
+        "/app/script3.sh param1 param2 param3"
+        "/app/script3.sh param1 param2 param3 param4"
+        "/app/script3.sh param1 param2 param3 param4 param5"
+        "/app/script3.sh param1 param2 param3 param4 param5 param6"
+        "/app/script3.sh param1 param2 param3 param4 param5 param6 param7"
+        "/app/script3.sh param1 param2 param3 param4 param5 param6 param7 param8"
+        "/app/script3.sh param1 param2 param3 param4 param5 param6 param7 param8 param9"
+        "/app/script3.sh param1 param2 param3 param4 param5 param6 param7 param8 param9 param10"
+    )
+
+    ejecutar_pruebas 3 pruebas[@] "Probando el script 3:"
 }
 
 function pruebas_script_4()
 {
     local pruebas=(
-        "/app/script4.sh /test/archivo1.txt /test/archivo2.txt"  # PRUEBA 1, se espera que sea exitosa
-        "/app/script4.sh /test/archivo3.txt /test/archivo4.txt"  # PRUEBA 2, se espera que sea exitosa
-        "/app/script4.sh /test/archivo1.txt /test/archivo3.txt"  # PRUEBA 2, se espera que sea exitosa
-        "/app/script4.sh /test/archivo4.txt /test/archivo2.txt"  # PRUEBA 2, se espera que sea exitosa
-        "/app/script4.sh /test/archivo3.txt"                     # PRUEBA 2, se espera que falle
-        "/app/script4.sh"                                        # PRUEBA 2, se espera que falle
+        "/app/script4.sh /test/archivo1.txt /test/archivo2.txt"
+        "/app/script4.sh /test/archivo3.txt /test/archivo4.txt"
+        "/app/script4.sh /test/archivo1.txt /test/archivo3.txt"
+        "/app/script4.sh /test/archivo4.txt /test/archivo2.txt"
+        "/app/script4.sh /test/archivo3.txt"
+        "/app/script4.sh /test/archivo4.txt /test/archivo5.txt"
+        "/app/script4.sh"
+        "/app/script4.sh /test/archivo4.txt /test/archivo5.txt /test/archivo6.txt"
     )
 
-    ejecutar_pruebas 4 pruebas[@] "Probando el script 4 con el parámetro"
+    ejecutar_pruebas 4 pruebas[@] "Probando el script 4:"
+}
+
+function pruebas_script_5()
+{
+    local pruebas=(
+        "/app/script5.sh"
+    )
+
+    ejecutar_pruebas 5 pruebas[@] "Probando el script 5:"
+
+    local pruebas=(
+        "/test/script5.sh"
+    )
+
+    ejecutar_pruebas 5 pruebas[@] "Probando el script 5:" /test
 }
 
 # Verificar si la imagen bash_test:unir existe
@@ -60,14 +117,20 @@ if ! docker image inspect bash_test:unir &> /dev/null; then
     docker build -t bash_test:unir .
 fi
 
-# Pedir al usuario que seleccione un número de script
-echo "¿Cuál script quieres probar? (1 al 5)"
-read opcion
+opcion=
 
-# Verificar si se ingresó un número válido
-if ! [[ "$opcion" =~ ^[1-5]$ ]]; then
-    echo "Opción inválida. Debes ingresar un número del 1 al 5."
-    exit 1
+if [[ $# -eq 0 ]]; then
+    # Pedir al usuario que seleccione un número de script
+    echo "¿Cuál script quieres probar? (1 al 5)"
+    read opcion
+
+    # Verificar si se ingresó un número válido
+    if ! [[ "$opcion" =~ ^[1-5]$ ]]; then
+        echo "Opción inválida. Debes ingresar un número del 1 al 5."
+        exit 1
+    fi
+else
+    opcion=$1
 fi
 
 # Ejecutar el script correspondiente según la opción seleccionada
@@ -76,16 +139,16 @@ case "$opcion" in
         pruebas_script_1
         ;;
     2)
-        docker run --rm bash_test:unir /app/script2.sh
+        pruebas_script_2
         ;;
     3)
-        docker run --rm bash_test:unir /app/script3.sh
+        pruebas_script_3
         ;;
     4)
         pruebas_script_4
         ;;
     5)
-        docker run --rm bash_test:unir /app/script5.sh
+        pruebas_script_5
         ;;
     *)
         echo "Opción inválida."

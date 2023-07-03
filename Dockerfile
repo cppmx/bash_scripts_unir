@@ -2,7 +2,7 @@ FROM alpine:latest
 
 USER root
 
-RUN apk --no-cache add bash
+RUN apk --no-cache add bash && adduser -D test
 
 WORKDIR /app
 
@@ -11,4 +11,6 @@ RUN chmod +x /app/*.sh
 
 COPY test/ /test
 
-USER 1001
+RUN cp /app/script5.sh /test/ && chown -R test:test /test
+
+USER test

@@ -1,5 +1,16 @@
 #!/bin/bash
-# Imprimir el nombre del script
+#
+# Materia: Administración de Sistemas en la Nube
+# Actividad grupal: Programación en Bash
+# Grupo: 1001 A"
+#
+# Escribir un script que imprima en este orden y en líneas diferentes:
+#   - El nombre del script que se está ejecutando.
+#   - El número de argumentos que se han pasado al script.
+#   - El primer y segundo argumentos, ambos en la misma línea.
+#   - Si hay más de dos argumentos, los argumentos a partir del tercero (este incluido) cada uno en una línea.
+
+# Escribir el nombre del script
 echo "Nombre del script: $0"
 
 # Imprimir el número de argumentos pasados al script

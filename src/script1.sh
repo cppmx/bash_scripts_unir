@@ -4,7 +4,7 @@
 # Actividad grupal: Programación en Bash
 # Grupo: 1001 A
 #
-#  Escribir un script en Bash que acepte una ruta a un fichero o un directorio e imprima por pantalla
+# Escribir un script en Bash que acepte una ruta a un fichero o un directorio e imprima por pantalla
 # si es un fichero normal, un directorio u otro tipo de fichero. Finalmente, el script ejecutará el
 # comando ls sobre esta ruta en formato largo.
 
@@ -20,6 +20,7 @@ function ayuda {
 
 # Verificar si se proporciona una ruta como argumento
 if [[ $# -eq 0 ]] || [[ $# -gt 1 ]]; then
+    echo "ERROR: Número incorrecto de argumentos"
     ayuda
     exit 1
 fi
@@ -34,7 +35,7 @@ ruta=$1
 
 # Verificar si la ruta existe
 if [[ ! -e "$ruta" ]]; then
-    echo "La ruta no existe."
+    echo "ERROR: La ruta no existe."
     exit 1
 fi
 
